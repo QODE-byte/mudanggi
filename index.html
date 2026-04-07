@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>무당기(巫堂記) — 신들이 지켜보는 이야기</title>
+<meta name="description" content="신내림을 거부해온 취준생이 신들의 시험 앞에 선다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#fbbf24;--purple:#c084fc;--teal:#67e8f9;--red:#f87171;
+  --bg:#08060f;--text:#e8e0d8;--muted:rgba(255,255,255,.4);
+}
+html,body{
+  width:100%;min-height:100vh;background:var(--bg);
+  font-family:'Noto Serif KR','Malgun Gothic',serif;
+  color:var(--text);overflow:hidden;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
+@keyframes twinkle{0%,100%{opacity:.08}50%{opacity:.35}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes deityIn{from{opacity:0;transform:translateY(-20px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes deityOut{from{opacity:1}to{opacity:0;transform:translateY(-10px)}}
+@keyframes mindamIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+
+#app{max-width:780px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;position:relative;}
+#stars-layer{position:fixed;inset:0;pointer-events:none;z-index:0;}
+.star{position:absolute;border-radius:50%;background:#c084fc;animation:twinkle 4s ease-in-out infinite;}
+
+/* HUD */
+#hud{
+  position:sticky;top:0;z-index:100;padding:10px 16px;
+  background:linear-gradient(180deg,rgba(8,6,15,.98) 80%,transparent 100%);
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid rgba(192,132,252,.12);min-height:44px;
+}
+#hud-left{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gold);letter-spacing:.1em;font-weight:700;}
+#hud-stats{display:flex;align-items:center;gap:10px;}
+#hud-trust-pills{display:flex;align-items:center;gap:10px;}
+.stat-pill{display:flex;align-items:center;gap:4px;font-size:10px;}
+.stat-track{width:36px;height:3px;background:rgba(255,255,255,.08);border-radius:2px;}
+.stat-fill{height:100%;border-radius:2px;transition:width .5s ease;}
+.seolhwa-tag{font-size:11px;color:var(--purple);letter-spacing:.04em;}
+.coin-tag{font-size:11px;padding:2px 8px;border:1px solid rgba(103,232,249,.25);border-radius:3px;background:rgba(103,232,249,.05);color:var(--teal);}
+#ep-info{font-size:10px;color:rgba(255,255,255,.18);letter-spacing:.08em;}
+#menu-btn{
+  background:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.4);
+  font-size:14px;padding:4px 8px;border-radius:3px;cursor:pointer;
+  transition:all .15s;font-family:inherit;
+}
+#menu-btn:hover{border-color:var(--gold);color:var(--gold);}
+#exit-btn{
+  background:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.4);
+  font-size:12px;padding:4px 8px;border-radius:3px;cursor:pointer;
+  transition:all .15s;font-family:inherit;
+}
+#exit-btn:hover{border-color:var(--red);color:var(--red);}
+
+/* STORY MAP */
+.story-map-title{font-size:11px;letter-spacing:.12em;color:rgba(255,255,255,.3);margin-top:28px;margin-bottom:14px;}
+.story-map-cards{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:18px;}
+.story-map-card{
+  padding:14px 18px;border:1px solid rgba(255,255,255,.08);border-radius:4px;
+  min-width:110px;text-align:center;transition:all .2s;position:relative;
+}
+.story-map-card.unlocked{cursor:default;}
+.story-map-card.locked{opacity:.4;background:rgba(255,255,255,.02);}
+.story-map-card-icon{font-size:28px;margin-bottom:6px;}
+.story-map-card-name{font-size:13px;font-weight:700;margin-bottom:4px;}
+.story-map-card-badge{
+  position:absolute;top:-6px;right:-6px;font-size:9px;padding:2px 6px;
+  border-radius:2px;letter-spacing:.04em;font-weight:700;
+}
+
+/* SHOP MODAL */
+#shop-modal{display:none;position:fixed;inset:0;z-index:260;align-items:center;justify-content:center;background:rgba(8,6,15,.82);backdrop-filter:blur(4px);}
+.shop-modal-content{
+  width:90%;max-width:520px;max-height:80vh;
+  background:#0d0b18;border:1px solid rgba(192,132,252,.18);border-radius:8px;
+  display:flex;flex-direction:column;overflow:hidden;animation:fadeUp .3s ease;
+}
+.shop-modal-header{padding:14px;border-bottom:1px solid rgba(255,255,255,.06);text-align:center;}
+.shop-modal-header-title{font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.08em;}
+.shop-modal-singi{font-size:18px;font-weight:700;color:var(--purple);margin-top:6px;}
+.shop-modal-body{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;}
+.shop-modal-close{
+  padding:10px;text-align:center;font-size:12px;letter-spacing:.1em;
+  background:none;border:none;border-top:1px solid rgba(255,255,255,.06);
+  color:rgba(255,255,255,.35);cursor:pointer;font-family:inherit;transition:color .15s;
+}
+.shop-modal-close:hover{color:var(--gold);}
+
+/* ENDING TEXT MODAL */
+#ending-text-modal{display:none;position:fixed;inset:0;z-index:270;align-items:center;justify-content:center;background:rgba(8,6,15,.88);backdrop-filter:blur(6px);}
+.ending-text-inner{
+  width:90%;max-width:440px;background:#0d0b18;border:1px solid rgba(192,132,252,.18);
+  border-radius:8px;padding:28px 24px;text-align:center;animation:fadeUp .3s ease;
+}
+.ending-text-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:14px;}
+.ending-text-body{font-size:13px;line-height:2;color:var(--purple);white-space:pre-wrap;margin-bottom:20px;font-style:italic;}
+.ending-text-close{
+  padding:8px 24px;background:none;border:1px solid rgba(255,255,255,.12);
+  color:rgba(255,255,255,.4);font-size:12px;border-radius:3px;cursor:pointer;font-family:inherit;
+}
+.ending-text-close:hover{border-color:var(--gold);color:var(--gold);}
+
+/* MAIN */
+#main{flex:1;display:flex;flex-direction:column;position:relative;z-index:10;}
+#scene-bg{flex:1;min-height:180px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.bg-overlay{position:absolute;inset:0;transition:background 1.2s ease;}
+.bg-shrine{background:radial-gradient(ellipse 70% 50% at 50% 30%,#1a0a2e 0%,#08060f 65%);}
+.bg-dark{background:radial-gradient(ellipse 70% 50% at 50% 30%,#120820 0%,#08060f 65%);}
+.bg-subway{background:radial-gradient(ellipse 70% 50% at 50% 30%,#0a1020 0%,#08060f 65%);}
+.bg-dream{background:radial-gradient(ellipse 80% 60% at 50% 40%,#1a0f30 0%,#08060f 50%);}
+.scene-illus{position:relative;z-index:1;text-align:center;padding:40px 24px;opacity:.15;font-size:72px;user-select:none;pointer-events:none;}
+
+/* DIALOG */
+#dialog-wrap{
+  position:relative;z-index:10;
+  border-top:1px solid rgba(192,132,252,.12);
+  background:linear-gradient(180deg,rgba(8,6,15,.72) 0%,rgba(8,6,15,.97) 100%);
+  padding:22px 26px 18px;cursor:pointer;min-height:164px;
+}
+#speaker-name{
+  display:inline-flex;align-items:center;font-size:12px;font-weight:700;letter-spacing:.1em;
+  padding:3px 12px;border:1px solid;border-radius:2px;margin-bottom:14px;background:rgba(0,0,0,.5);
+  transition:color .3s,border-color .3s;
+}
+#dialog-text{font-size:15px;line-height:2;color:var(--text);white-space:pre-wrap;min-height:60px;}
+#cursor-blink{display:inline;animation:blink .7s step-end infinite;color:var(--gold);}
+#skip-hint{font-size:10px;color:rgba(255,255,255,.14);text-align:right;margin-top:8px;letter-spacing:.05em;}
+
+/* CHOICES */
+#choices-wrap{position:relative;z-index:10;padding:6px 26px 28px;background:rgba(8,6,15,.97);display:none;flex-direction:column;gap:8px;}
+.choice-btn{
+  display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+  padding:12px 16px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.08);
+  border-radius:3px;color:#b5b0a8;font-size:14px;cursor:pointer;font-family:inherit;
+  letter-spacing:.02em;transition:background .15s,border-color .15s,color .15s,transform .12s;
+  animation:slideIn .25s ease both;
+}
+.choice-btn:hover:not(:disabled){background:rgba(192,132,252,.08);border-color:var(--purple);color:#e9d5ff;transform:translateX(5px);}
+.choice-btn:disabled.choice-locked-disabled{opacity:.38;cursor:not-allowed;}
+.choice-arrow{color:var(--gold);font-size:10px;flex-shrink:0;}
+.choice-arrow.locked-afford{color:#fbbf24;}
+.choice-arrow.locked-broke{color:rgba(255,255,255,.25);}
+.choice-fx{margin-left:auto;font-size:10px;color:rgba(255,255,255,.22);letter-spacing:.05em;flex-shrink:0;}
+.choice-lock-cost{margin-left:auto;font-size:10px;color:#fbbf24;letter-spacing:.05em;flex-shrink:0;padding:2px 6px;border:1px solid rgba(251,191,36,.3);border-radius:2px;}
+.choice-lock-cost.broke{color:rgba(255,255,255,.2);border-color:rgba(255,255,255,.1);}
+
+/* DEITY POPUP */
+#constellation-popup{
+  display:none;position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:200;
+  max-width:420px;width:90%;padding:14px 20px;
+  background:linear-gradient(135deg,rgba(192,132,252,.12) 0%,rgba(251,191,36,.08) 100%);
+  border:1px solid rgba(192,132,252,.25);border-radius:6px;backdrop-filter:blur(8px);
+  animation:deityIn .4s ease;text-align:center;
+}
+#constellation-popup.hiding{animation:deityOut .3s ease forwards;}
+.const-msg{font-size:12px;color:var(--purple);line-height:1.7;}
+.const-coin{font-size:11px;color:var(--gold);margin-top:6px;}
+.const-favor{font-size:10px;color:rgba(255,255,255,.28);margin-top:4px;}
+
+/* MINDAM POPUP (설화 팝업) */
+#seolhwa-popup{
+  display:none;position:fixed;inset:0;z-index:300;
+  align-items:center;justify-content:center;
+  background:rgba(8,6,15,.88);backdrop-filter:blur(6px);
+  animation:mindamIn .5s ease;
+}
+.seolhwa-popup-inner{text-align:center;padding:40px;}
+.seolhwa-popup-icon{font-size:64px;margin-bottom:16px;}
+.seolhwa-popup-label{font-size:10px;letter-spacing:.3em;color:var(--gold);margin-bottom:8px;}
+.seolhwa-popup-name{font-size:22px;font-weight:700;color:#fff;margin-bottom:8px;}
+.seolhwa-popup-desc{font-size:13px;color:var(--purple);line-height:1.8;max-width:380px;}
+
+/* TITLE */
+#title-screen{
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100vh;padding:48px 24px;text-align:center;position:relative;z-index:10;
+  animation:fadeUp .6s ease;
+}
+.title-label{font-size:10px;letter-spacing:.35em;color:var(--gold);margin-bottom:14px;opacity:.7;}
+.title-main{font-size:clamp(40px,9vw,72px);font-weight:900;line-height:1.08;color:#fff;margin-bottom:8px;letter-spacing:-.02em;text-shadow:0 0 80px rgba(192,132,252,.2);}
+.title-sub{font-size:16px;font-weight:400;color:var(--purple);margin-bottom:6px;letter-spacing:.05em;}
+.title-en{font-size:11px;letter-spacing:.18em;color:rgba(255,255,255,.22);margin-bottom:28px;}
+.title-divider{width:40px;height:1px;background:rgba(192,132,252,.35);margin:0 auto 24px;}
+.title-quote{font-size:14px;line-height:2;color:rgba(255,255,255,.45);margin-bottom:40px;font-style:italic;}
+.orv-btn{
+  padding:13px 42px;background:transparent;border:1px solid var(--purple);color:var(--purple);
+  font-size:13px;letter-spacing:.12em;cursor:pointer;border-radius:2px;font-family:inherit;
+  transition:background .2s,box-shadow .2s,transform .1s;
+}
+.orv-btn:hover{background:rgba(192,132,252,.1);box-shadow:0 0 24px rgba(192,132,252,.15);}
+.orv-btn:active{transform:scale(.98);}
+.char-select-title{font-size:11px;letter-spacing:.12em;color:rgba(255,255,255,.3);margin-bottom:14px;margin-top:28px;}
+.char-cards{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:18px;}
+.char-card{
+  padding:14px 18px;border:1px solid rgba(255,255,255,.08);border-radius:4px;
+  background:rgba(255,255,255,.02);cursor:pointer;min-width:130px;text-align:center;
+  transition:all .2s;position:relative;
+}
+.char-card:hover,.char-card.selected{border-color:var(--purple);background:rgba(192,132,252,.07);transform:translateY(-2px);}
+.char-card-name{font-size:14px;font-weight:700;margin-bottom:4px;}
+.char-card-desc{font-size:11px;color:rgba(255,255,255,.38);line-height:1.5;white-space:pre-line;}
+.char-badge{position:absolute;top:-6px;right:-6px;font-size:9px;padding:2px 6px;border-radius:2px;background:rgba(103,232,249,.12);border:1px solid rgba(103,232,249,.28);color:var(--teal);}
+.legal-note{margin-top:20px;font-size:10px;color:rgba(255,255,255,.14);}
+
+/* CLEAR */
+#clear-screen{
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100vh;padding:48px 24px;text-align:center;position:relative;z-index:10;
+  animation:fadeUp .5s ease;
+}
+.clear-star{font-size:40px;color:var(--gold);margin-bottom:18px;animation:pulse 2.5s ease infinite;}
+.clear-ep{font-size:10px;letter-spacing:.25em;color:rgba(255,255,255,.25);margin-bottom:8px;}
+.clear-title{font-size:26px;font-weight:700;color:#fff;margin-bottom:22px;}
+.clear-msg{font-size:13px;line-height:2.1;color:var(--purple);margin-bottom:28px;white-space:pre-wrap;max-width:440px;font-style:italic;}
+.stats-grid{display:flex;gap:28px;margin-bottom:36px;}
+.stat-card{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11px;color:rgba(255,255,255,.4);}
+.stat-val{font-size:24px;font-weight:700;}
+.ending-label{font-size:11px;letter-spacing:.1em;padding:4px 14px;border-radius:2px;margin-bottom:24px;}
+.clear-buttons{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+
+/* MODAL */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:250;
+  align-items:center;justify-content:center;
+  background:rgba(8,6,15,.82);backdrop-filter:blur(4px);
+}
+.modal-content{
+  width:90%;max-width:520px;max-height:80vh;
+  background:#0d0b18;border:1px solid rgba(192,132,252,.18);border-radius:8px;
+  display:flex;flex-direction:column;overflow:hidden;
+  animation:fadeUp .3s ease;
+}
+.modal-tabs-wrap{display:flex;overflow-x:auto;border-bottom:1px solid rgba(255,255,255,.06);padding:0 4px;}
+.modal-tab{
+  flex-shrink:0;padding:10px 14px;font-size:11px;letter-spacing:.04em;
+  background:none;border:none;color:rgba(255,255,255,.35);cursor:pointer;
+  font-family:inherit;border-bottom:2px solid transparent;transition:all .15s;
+}
+.modal-tab:hover{color:rgba(255,255,255,.65);}
+.modal-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.modal-body{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;}
+.modal-empty{text-align:center;color:rgba(255,255,255,.28);padding:36px 0;font-size:13px;}
+.modal-card{
+  display:flex;align-items:center;gap:12px;padding:12px;
+  background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);
+  border-radius:4px;
+}
+.modal-card.locked{opacity:.45;}
+.modal-card.seolhwa-owned{border-color:rgba(192,132,252,.28);background:rgba(192,132,252,.04);}
+.modal-card-icon{font-size:22px;flex-shrink:0;width:34px;text-align:center;}
+.modal-card-info{flex:1;min-width:0;}
+.modal-card-name{font-size:13px;font-weight:700;margin-bottom:2px;}
+.modal-card-desc{font-size:11px;color:rgba(255,255,255,.38);line-height:1.5;}
+.modal-card-btn{
+  flex-shrink:0;padding:5px 10px;font-size:11px;
+  background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);
+  color:var(--gold);border-radius:3px;cursor:pointer;font-family:inherit;transition:all .15s;
+}
+.modal-card-btn:hover{background:rgba(251,191,36,.15);}
+.modal-card-btn.disabled{opacity:.28;cursor:not-allowed;}
+.const-bar-wrap{width:100%;height:3px;background:rgba(255,255,255,.08);border-radius:2px;margin:4px 0;}
+.const-bar{height:100%;border-radius:2px;transition:width .5s;}
+.modal-close-btn{
+  padding:10px;text-align:center;font-size:12px;letter-spacing:.1em;
+  background:none;border:none;border-top:1px solid rgba(255,255,255,.06);
+  color:rgba(255,255,255,.35);cursor:pointer;font-family:inherit;transition:color .15s;
+}
+.modal-close-btn:hover{color:var(--gold);}
+
+/* FOOTER */
+#footer-bar{text-align:center;padding:12px;font-size:10px;color:rgba(255,255,255,.1);border-top:1px solid rgba(255,255,255,.04);position:relative;z-index:10;}
+
+/* MOBILE */
+@media(max-width:520px){
+  #dialog-wrap{padding:18px 18px 14px;}
+  #choices-wrap{padding:4px 18px 22px;}
+  .char-cards{gap:8px;}
+  .char-card{min-width:110px;padding:12px 14px;}
+  #hud{padding:8px 12px;}
+  .stat-track{width:28px;}
+  .modal-content{width:95%;max-height:85vh;}
+  .stats-grid{gap:18px;}
+  .story-map-cards{gap:8px;}
+  .story-map-card{min-width:90px;padding:10px 12px;}
+  .shop-modal-content{width:95%;max-height:85vh;}
+  .ending-text-inner{width:95%;}
+}
+</style>
+</head>
+<body>
+
+<div id="stars-layer"></div>
+
+<!-- 신위 팝업 -->
+<div id="constellation-popup">
+  <div class="const-msg" id="const-msg"></div>
+  <div class="const-coin" id="const-coin"></div>
+  <div class="const-favor" id="const-favor"></div>
+</div>
+
+<!-- 민담 팝업 -->
+<div id="seolhwa-popup">
+  <div class="seolhwa-popup-inner">
+    <div class="seolhwa-popup-label">민담 획득</div>
+    <div class="seolhwa-popup-icon" id="seolhwa-popup-icon"></div>
+    <div class="seolhwa-popup-name" id="seolhwa-popup-name"></div>
+    <div class="seolhwa-popup-desc" id="seolhwa-popup-desc"></div>
+  </div>
+</div>
+
+<!-- 모달 -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-tabs-wrap" id="modal-tabs"></div>
+    <div class="modal-body" id="modal-body"></div>
+    <button class="modal-close-btn" id="modal-close-btn">닫기</button>
+  </div>
+</div>
+
+<!-- 타이틀 상점 모달 -->
+<div id="shop-modal">
+  <div class="shop-modal-content">
+    <div class="shop-modal-header">
+      <div class="shop-modal-header-title">🛒 상점</div>
+      <div class="shop-modal-singi" id="shop-singi-display">보유 신기: 0</div>
+    </div>
+    <div class="shop-modal-body" id="shop-modal-body"></div>
+    <button class="shop-modal-close" id="shop-modal-close">닫기</button>
+  </div>
+</div>
+
+<!-- 엔딩 텍스트 모달 -->
+<div id="ending-text-modal">
+  <div class="ending-text-inner">
+    <div class="ending-text-title" id="ending-text-title"></div>
+    <div class="ending-text-body" id="ending-text-body"></div>
+    <button class="ending-text-close" id="ending-text-close">닫기</button>
+  </div>
+</div>
+
+<div id="app">
+
+  <!-- 타이틀 -->
+  <div id="title-screen">
+    <div class="title-label">MUDANGGI — 巫堂記</div>
+    <div class="title-main">무당기</div>
+    <div class="title-sub">巫堂記</div>
+    <div class="title-en">신들이 지켜보는 이야기</div>
+    <div class="title-divider"></div>
+    <div class="title-quote">"신내림을 거부해온 취준생이<br>신들의 시험 앞에 선다."</div>
+    <div class="char-select-title">-- 주인공 선택 --</div>
+    <div class="char-cards" id="char-cards"></div>
+    <div class="story-map-title">-- 해금된 이야기 --</div>
+    <div class="story-map-cards" id="story-map-cards"></div>
+    <button class="orv-btn" id="start-btn">이야기 시작하기</button>
+    <button class="orv-btn" id="shop-btn" style="margin-top:12px;width:50%;min-width:160px;">🛒 상점</button>
+    <div class="true-end-hint" id="true-end-hint" style="display:none"></div>
+    <div class="legal-note">오리지널 IP . 한국 무속신앙 기반 선택형 비주얼노벨 . 프로토타입 v0.1</div>
+  </div>
+
+  <!-- 게임 -->
+  <div id="game-screen" style="display:none;flex-direction:column;flex:1;">
+    <div id="hud">
+      <div id="hud-left">무당기</div>
+      <div id="ep-info">1막 · 귀가</div>
+      <div id="hud-stats">
+        <div id="hud-trust-pills"></div>
+        <span class="seolhwa-tag" id="val-seolhwa">📜 0</span>
+        <span class="coin-tag" id="val-coin">🔮 0</span>
+        <button id="exit-btn">← 나가기</button>
+        <button id="menu-btn">☰</button>
+      </div>
+    </div>
+    <div id="main">
+      <div id="scene-bg">
+        <div class="bg-overlay bg-dark" id="bg-overlay"></div>
+        <div class="scene-illus" id="scene-illus">🕯️</div>
+      </div>
+      <div id="dialog-wrap" onclick="skipTyping()">
+        <div id="speaker-name"></div>
+        <div id="dialog-text"></div>
+        <div id="skip-hint">클릭하여 건너뛰기</div>
+      </div>
+      <div id="choices-wrap"></div>
+    </div>
+    <div id="footer-bar">무당기(巫堂記) · 1막 프로토타입 · 오리지널 IP</div>
+  </div>
+
+  <!-- 클리어 -->
+  <div id="clear-screen">
+    <div class="clear-star" id="clear-star">◈</div>
+    <div class="clear-ep" id="clear-ep-label">1막</div>
+    <div class="clear-title" id="clear-title">클리어!</div>
+    <div class="clear-msg" id="clear-msg"></div>
+    <div id="ending-badge" class="ending-label"></div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span style="color:var(--purple)">인연</span>
+        <span class="stat-val" style="color:var(--purple)" id="final-trust">0</span>
+      </div>
+      <div class="stat-card">
+        <span style="color:var(--gold)">민담</span>
+        <span class="stat-val" style="color:var(--gold)" id="final-seolhwa">0</span>
+      </div>
+      <div class="stat-card">
+        <span style="color:var(--teal)">신기</span>
+        <span class="stat-val" style="color:var(--teal)" id="final-coin">0</span>
+      </div>
+    </div>
+    <div class="clear-buttons">
+      <button class="orv-btn" id="next-ep-btn" style="display:none;">2막으로 ▶</button>
+      <button class="orv-btn" id="retry-btn">처음부터 다시</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// =======================================
+// DATA — 무당기(巫堂記) 게임 데이터
+// =======================================
+
+const CHARS = {
+  maehyang: {
+    name:'이매향', col:'#c084fc',
+    desc:'취준생 / 무당의 딸\n신내림을 거부해온 24세',
+    illus:'🕯️', style:'직관/감성'
+  },
+};
+
+// --- 화자 맵 ---
+const SPEAKER_MAP = {
+  maehyang: {name:'이매향',    col:'#c084fc'},
+  chilsung:  {name:'칠성신',   col:'#fbbf24'},
+  samshin:   {name:'삼신할머니',col:'#f9a8d4'},
+  sungju:    {name:'성주신',   col:'#86efac'},
+  gumiho:    {name:'구미호 신모',col:'#fb923c'},
+  mother:    {name:'어머니',   col:'#a78bfa'},
+  neighbor:  {name:'아주머니', col:'#6ee7b7'},
+  woman:     {name:'여자',     col:'#f9a8d4'},
+  child:     {name:'아이',     col:'#67e8f9'},
+  narrator:  {name:'',         col:'#94a3b8'},
+  system:    {name:'SYSTEM',   col:'#22d3ee'},
+};
+
+// --- 인연 대상 인물 ---
+const TRUST_TARGETS = {
+  mother:   {name:'어머니',   col:'#a78bfa', icon:'🕯️'},
+  neighbor: {name:'아주머니', col:'#6ee7b7', icon:'🏠'},
+  woman:    {name:'단골손님', col:'#f9a8d4', icon:'🙏'},
+  child:    {name:'아이',     col:'#67e8f9', icon:'👁️'},
+};
+
+// --- 신위(神位) 8신 — 성좌 대체 ---
+const DEITIES = {
+  chilsung: {
+    name:'칠성신(七星神)', icon:'⭐',
+    likes:['지혜','관찰','진실','거래'], dislikes:['충동','거짓','회피'],
+  },
+  sanshin: {
+    name:'산신(山神)', icon:'🏔️',
+    likes:['용기','보호','수용','강인'], dislikes:['도주','비겁'],
+  },
+  yongwang: {
+    name:'용왕(龍王)', icon:'🐉',
+    likes:['관대','재물','포용','의외'], dislikes:['탐욕','인색'],
+  },
+  samshin: {
+    name:'삼신할머니', icon:'🌸',
+    likes:['생명','수용','희생','사랑'], dislikes:['포기','냉담'],
+  },
+  jeosung: {
+    name:'저승사자', icon:'⚖️',
+    likes:['공정','원칙','진실','냉정'], dislikes:['거짓','불공정'],
+  },
+  dokkaebi: {
+    name:'도깨비 대왕', icon:'🪄',
+    likes:['의외','반전','유쾌','창의'], dislikes:['고지식','포기'],
+  },
+  gumiho: {
+    name:'구미호 신모', icon:'🦊',
+    likes:['진실','직관','탐구','통찰'], dislikes:['은폐','회피'],
+  },
+  sungju: {
+    name:'성주신(城主神)', icon:'🏠',
+    likes:['공동체','희생','수용','책임'], dislikes:['이기심','파괴'],
+  },
+};
+
+// --- 스킬 데이터 ---
+const SKILLS = {
+  maehyang: [
+    {id:'sense',      name:'신감(神感)',   desc:'신들의 시선을 느낀다. 선택지 태그를 희미하게 감지한다.', locked:false, cost:0},
+    {id:'ritual',     name:'굿법(巫法)',   desc:'기본 굿 의식 진행 가능. 어머니에게 배운 동작들.', locked:false, cost:0},
+    {id:'contract',   name:'계약술(契約)', desc:'칠성신과의 거래 완성 시 해금. 신기 회복 속도 증가.', locked:true, cost:0, condition:'칠성신 거래 완성'},
+    {id:'mindam_eye', name:'민담안(民譚眼)',desc:'민담 3개 이상 수집 시 해금. 숨겨진 선택지 감지.', locked:true, cost:0, condition:'민담 3개 이상 수집'},
+  ],
+};
+
+// --- 아이템 데이터 ---
+const ITEMS = {
+  shinnul:    {name:'신물(神物)',    desc:'어머니의 부채. 받는 순간 무언가가 바뀐다.',        icon:'🪭'},
+  incense:    {name:'향(香)',       desc:'신당의 오래된 향. 냄새가 기억을 불러온다.',        icon:'🌿'},
+  note:       {name:'단서 쪽지',   desc:'단골손님이 남긴 쪽지. 아이에 대한 내용.',         icon:'📝'},
+  eyeclosed:  {name:'닫힌 눈',     desc:'아이 앞에서 눈을 감아 본 기억. 무언가 보였다.',   icon:'👁️'},
+};
+
+// --- 민담 정의 (설화 대체) ---
+const MINDAM_DEFS = {
+  bari:      {name:'바리공주',    desc:'버려진 딸이 죽음을 건너 생명수를 가져왔다. 아무도 시키지 않았다.', condition:'희생 선택 2회', icon:'🌺'},
+  shimchung: {name:'심청이',      desc:'아버지의 눈을 위해 스스로 바다에 몸을 던졌다. 결국 돌아왔다.',   condition:'수용 선택 3회', icon:'🌊'},
+  arang:     {name:'아랑 설화',   desc:'억울하게 죽은 처녀의 원한. 진실을 말해준 자만이 풀 수 있었다.',  condition:'집 안 진입 후 진실 선택', icon:'👻'},
+  gumiho_s:  {name:'구미호 전설', desc:'천 년을 기다린 구미호. 인간이 되려 했으나 결국은 자신이었다.',   condition:'직관 선택 3회', icon:'🦊'},
+};
+
+// --- 상점 (신기 소비) ---
+const SHOP_ITEMS = [
+  {id:'hint',      name:'신탁(神託)',    desc:'다음 선택지의 결과를 희미하게 감지한다.', cost:15, icon:'🔮'},
+  {id:'mindam_h',  name:'민담 실마리',  desc:'미수집 민담의 획득 조건을 확인한다.',    cost:10, icon:'📜'},
+  {id:'skill_u',   name:'신기 충전',    desc:'신기를 10 즉시 회복한다.',              cost:0,  icon:'✨', special:'recharge'},
+];
+
+</script>
+<script>
+// =======================================
+// SCENES — 무당기(巫堂記) 1막 씬 데이터
+// =======================================
+// fx 포맷:
+//   trust: {인물키: 값}   — 인연 변화
+//   singi: 값              — 신기 변화
+//   deity: {신위키: 값}   — 신위 인연 변화
+//   tags: ['태그']         — 신위 매칭 + 민담 조건 추적
+//   item: '아이템키'        — 아이템 획득
+//   mindam: '민담키'        — 민담 즉시 획득
+//   flag: {키: 값}          — 플래그 설정
+//
+// locked: N — 신기 N 소모 필요. 0 또는 생략 = 무료
+
+const SCENES_MAEHYANG = {
+
+  // ============================================================
+  // 씬 1-1: 귀가
+  // ============================================================
+
+  's0': {
+    sp:'narrator', illus:'🌆', bg:'shrine',
+    txt:'저녁 7시.\n서울 외곽, 어느 빌라 지하 계단.\n\n간판도 없는 반지하. 문 앞에 금줄이 걸려 있다.',
+    ch:[{t:'계속하기 ▶', n:'s1', fx:{}}]
+  },
+
+  's1': {
+    sp:'maehyang', illus:'🕯️', bg:'shrine',
+    txt:'…또 이 냄새.\n\n향 냄새. 어릴 때부터 지독하게 싫었다.\n아직도 어딘가에 배어 있는 것 같은 냄새.',
+    ch:[{t:'계속하기 ▶', n:'s2', fx:{}}]
+  },
+
+  's2': {
+    sp:'neighbor', illus:'🏠', bg:'shrine',
+    txt:'"어, 매향이 왔어? 오래됐다."\n\n"어머니가 쓰러지기 전에—\n이걸 꼭 네가 받아야 한다고 하셨어."\n\n아주머니가 작은 부채를 내밀었다.',
+    ch:[{t:'계속하기 ▶', n:'s3', fx:{}}]
+  },
+
+  // === 씬 1-1 메인 선택지 ===
+  's3': {
+    sp:'maehyang', illus:'🪭', bg:'shrine',
+    txt:'신물(神物).\n\n어머니가 20년째 쓰던 것.\n받는다는 건—\n\n받는다는 게 무슨 의미인지 모르지 않는다.',
+    ch:[
+      {t:'"알겠어요. 받을게요."',
+       n:'s3a', fx:{trust:{mother:5}, singi:10, tags:['수용'], flag:{shinnul:true}, item:'shinnul'},
+       hint:'+신기 10'},
+      {t:'"일단 병원부터 가야 해요."',
+       n:'s3b', fx:{trust:{mother:-3}, singi:0, tags:['현실']}},
+      {t:'(아무 말도 하지 않고 바라본다.)',
+       n:'s3c', fx:{singi:5, tags:['관찰'], deity:{chilsung:3}},
+       hint:'+신기 5'},
+    ]
+  },
+
+  // A 루트: 신물 수락
+  's3a': {
+    sp:'narrator', illus:'🪭', bg:'shrine',
+    txt:'생각보다 무거웠다.\n\n아니, 무게는 없었다. 그런데 손이 무거웠다.',
+    ch:[{t:'계속하기 ▶', n:'s4a', fx:{}}]
+  },
+
+  's4a': {
+    sp:'neighbor', illus:'🏠', bg:'shrine',
+    txt:'"잘 생각했어. 어머니도 기다리셨을 거야."\n\n잠깐의 침묵.\n\n"신당은… 네가 봐줄 거지?"',
+    ch:[
+      {t:'신당 문을 한 번 더 본다.',  n:'s5a',  fx:{singi:2, tags:['관찰']}},
+      {t:'대답하지 않고 나온다.',      n:'s5bc', fx:{trust:{neighbor:-2}}},
+    ]
+  },
+
+  // B/C 루트 공통 진입
+  's3b': {
+    sp:'narrator', illus:'🏥', bg:'dark',
+    txt:'부채는 아주머니 손에 그대로 있었다.\n\n어머니는 응급실 침대에 누워 있었다.\n맥박은 고르게 뛰었다.',
+    ch:[{t:'계속하기 ▶', n:'s3b_2', fx:{}}]
+  },
+
+  's3b_2': {
+    sp:'mother', illus:'🕯️', bg:'dark',
+    txt:'"…왔구나."\n\n눈을 뜨지 않고 말했다.\n\n"네가 안 받을 것 같아서."',
+    ch:[
+      {t:'"나 아직 뭔지도 모르잖아."',  n:'s4bc', fx:{trust:{mother:-2}, tags:['현실']}},
+      {t:'(아무 말도 하지 않는다.)',      n:'s4bc', fx:{tags:['관찰']}},
+    ]
+  },
+
+  's3c': {
+    sp:'narrator', illus:'🪭', bg:'shrine',
+    txt:'부채를 내려다봤다.\n\n내리지 않았다. 올리지도 않았다.\n그냥 거기, 그 무게가 있었다.',
+    ch:[{t:'계속하기 ▶', n:'s4bc', fx:{}}]
+  },
+
+  // 공통: 씬 1-1b 마무리
+  's4bc': {
+    sp:'neighbor', illus:'🏠', bg:'shrine',
+    txt:'"그래도 신당은 좀 봐줄 수 있지?"\n\n"손님이 왔는데 문이 잠겨 있대."\n\n문자 알림이 왔다.',
+    ch:[
+      {t:'신당 문을 확인하러 간다.',   n:'s5bc', fx:{trust:{neighbor:3}, singi:2}},
+      {t:'내일 할게요, 라고 답한다.', n:'s5bc', fx:{trust:{neighbor:-3}, tags:['현실']}},
+    ]
+  },
+
+  // A 루트 → 씬 1-2 분기점
+  's5a': {
+    sp:'narrator', illus:'🕯️', bg:'shrine',
+    txt:'신당 안.\n\n어머니가 없는 자리. 신단(神壇) 위에 부채가 놓였다.\n\n가방 속 핸드폰이 울렸다. 면접 알림.\n내일 오후 2시.',
+    ch:[{t:'계속하기 ▶', n:'s5a_2', fx:{}}]
+  },
+
+  's5a_2': {
+    sp:'narrator', illus:'📱', bg:'shrine',
+    txt:'신물을 받았다.\n\n신당에 있는 건 자연스럽다.\n그런데 면접은—\n\n이상하게, 생각이 잘 안 났다.',
+    ch:[{t:'계속하기 ▶', n:'s6_choice', fx:{}}]
+  },
+
+  // B/C 루트 → 씬 1-2
+  's5bc': {
+    sp:'narrator', illus:'🌆', bg:'dark',
+    txt:'고시원으로 돌아왔다.\n\n벽에 붙은 면접 일정표. 내일 오후 2시.\n\n핸드폰에 아주머니 문자가 왔다.\n"그 손님, 아직 기다린대."',
+    ch:[{t:'계속하기 ▶', n:'s6_choice', fx:{}}]
+  },
+
+  // ============================================================
+  // 씬 1-2: 현실 충돌
+  // ============================================================
+
+  // A 루트 전용: 강제 면접 미룸
+  's6_forced_A': {
+    sp:'narrator', illus:'📱', bg:'dark',
+    txt:'오전 11시. 카톡이 왔다.\n\n아주머니: "매향아, 그 손님 오늘 또 왔어."\n\n부채가 가방 안에서 진동하는 것 같았다.\n아니, 진동이 아니었다. 그냥—무거웠다.',
+    ch:[{t:'계속하기 ▶', n:'s6_forced_A2', fx:{}}]
+  },
+
+  's6_forced_A2': {
+    sp:'maehyang', illus:'📱', bg:'dark',
+    txt:'(면접 담당자에게 문자를 보냈다.)\n\n"개인 사정이 생겼습니다.\n일정 조정이 가능할까요?"\n\n보내놓고 화면을 껐다. 후회는 나중에.',
+    ch:[{t:'계속하기 ▶', n:'s6_choice', fx:{trust:{mother:5}, singi:5, tags:['수용'], flag:{faceDelayed:true}}}]
+  },
+
+  // 공통 선택지 (B/C 루트는 여기서 바로)
+  's6_choice': {
+    sp:'narrator', illus:'⏰', bg:'dark',
+    txt:'오후 2시까지 3시간.\n\n신당까지 버스로 40분.\n\n핸드폰이 또 울렸다.',
+    ch:[
+      {t:'"신당에는 못 간다. 면접이 먼저다."',
+       n:'s7a', fx:{trust:{mother:-5}, tags:['현실']}},
+      {t:'"면접은 다음에도 있다. 신당에 간다."',
+       n:'s7b', fx:{trust:{mother:8}, singi:5, tags:['수용'], deity:{samshin:5}},
+       hint:'+신기 5'},
+      {t:'"일정 조정 요청하고, 신당도 잠깐 간다."',
+       n:'s7c', locked:15,
+       fx:{trust:{mother:5}, singi:-10, tags:['지혜'], deity:{chilsung:5}},
+       hint:'🔒 신기 15 소모'},
+    ]
+  },
+
+  // 씬 1-2 결과 분기
+  's7a': {
+    sp:'narrator', illus:'🏢', bg:'dark',
+    txt:'면접은 잘 됐다. 아마도.\n\n집에 돌아오는 길, 아주머니 문자.\n"손님 그냥 갔어. 많이 힘들어 보이더라."\n\n읽고 껐다.',
+    ch:[{t:'계속하기 ▶', n:'s8', fx:{trust:{neighbor:-3}, tags:['현실']}}]
+  },
+
+  's7b': {
+    sp:'narrator', illus:'🕯️', bg:'shrine',
+    txt:'버스 안에서 면접 준비 자료를 꺼냈다.\n한 글자도 안 들어왔다.\n\n신당 문을 열었다. 손님은 기다리고 있었다.\n\n눈이 퉁퉁 부어 있었다.',
+    ch:[{t:'계속하기 ▶', n:'s8', fx:{trust:{woman:5}, singi:3}}]
+  },
+
+  's7c': {
+    sp:'narrator', illus:'📱', bg:'dark',
+    txt:'담당자가 흔쾌히 승낙했다. 오후 4시로.\n\n10분 있었다. 신당에.\n손님한테 다음에 오라고 했다.\n\n버스 안에서 면접 자료를 폈다.\n이번엔 조금 읽혔다.',
+    ch:[{t:'계속하기 ▶', n:'s8', fx:{trust:{mother:3}, trust2:{woman:3}}}]
+  },
+
+  // ============================================================
+  // 씬 1-3: 첫 신위 등장
+  // ============================================================
+
+  's8': {
+    sp:'narrator', illus:'🚇', bg:'subway',
+    txt:'저녁 지하철.\n\n2호선. 창밖 터널이 흘렀다.\n\n매향은 앉아서 졸고 있었다.\n소리가 없어졌다.',
+    ch:[{t:'계속하기 ▶', n:'s8_stop', fx:{}}]
+  },
+
+  's8_stop': {
+    sp:'narrator', illus:'🚇', bg:'subway',
+    txt:'지하철이 멈췄다.\n\n아니, 멈춘 게 아니었다. 소리가 없어졌다.\n\n사람들은 그대로였다.\n핸드폰을 보고, 이어폰을 끼고, 자고 있었다.\n\n움직이지 않았다.',
+    ch:[{t:'계속하기 ▶', n:'s8_chil', fx:{}}]
+  },
+
+  // 칠성신 등장 — 루트별 분기는 s8에서 오는 경로 태그로 구분
+  // (단순화: 하나의 씬, 루트별 텍스트 차이는 후속 개발에서 처리)
+  's8_chil': {
+    sp:'chilsung', illus:'⭐', bg:'dark',
+    txt:'맞은편 좌석.\n\n노인이었다. 아니, 노인처럼 보였다.\n\n"왔구나."',
+    ch:[{t:'계속하기 ▶', n:'s8_chil2', fx:{deity:{chilsung:2}}}]
+  },
+
+  's8_chil2': {
+    sp:'maehyang', illus:'🕯️', bg:'dark',
+    txt:'"…누구세요."\n\n물었다. 어디서 나온 말인지 몰랐다.',
+    ch:[{t:'계속하기 ▶', n:'s8_chil3', fx:{}}]
+  },
+
+  's8_chil3': {
+    sp:'chilsung', illus:'⭐', bg:'dark',
+    txt:'"네 어머니는 하루에 세 번씩 내 이름을 불렀다."\n\n"칠성신(七星神)이다."\n\n침묵이 길었다.',
+    ch:[{t:'계속하기 ▶', n:'s9_choice', fx:{deity:{chilsung:3}}}]
+  },
+
+  // 씬 1-3 메인 선택지
+  's9_choice': {
+    sp:'chilsung', illus:'⭐', bg:'dark',
+    txt:'"네게 묻겠다."\n\n"왜 왔느냐."',
+    ch:[
+      {t:'"당신이 뭔데 저한테 묻습니까."',
+       n:'s9a', fx:{deity:{chilsung:3}, tags:['저항']},
+       hint:'칠성신 +인연 3'},
+      {t:'"…모르겠어요. 그냥 여기 있었어요."',
+       n:'s9b', fx:{deity:{chilsung:5}, singi:5, tags:['관찰']},
+       hint:'+신기 5'},
+      {t:'"거래를 제안하고 싶습니다."',
+       n:'s9c', locked:20,
+       fx:{deity:{chilsung:15}, singi:-15, tags:['지혜'], flag:{dealProposed:true}},
+       hint:'🔒 신기 20 소모'},
+    ]
+  },
+
+  // 선택지 결과 분기
+  's9a': {
+    sp:'chilsung', illus:'⭐', bg:'dark',
+    txt:'"…"\n\n침묵이 길었다.\n\n"좋아. 그 질문이 더 낫군."',
+    ch:[{t:'계속하기 ▶', n:'s10', fx:{deity:{chilsung:2}}}]
+  },
+
+  's9b': {
+    sp:'chilsung', illus:'⭐', bg:'dark',
+    txt:'"정직하군."\n\n노인이 처음으로 표정을 바꿨다.\n딱딱한 게 아니라, 조금—달라졌다.',
+    ch:[{t:'계속하기 ▶', n:'s10', fx:{deity:{chilsung:2}}}]
+  },
+
+  's9c': {
+    sp:'chilsung', illus:'⭐', bg:'dark',
+    txt:'"이름도 모르는 신에게. 거래를."\n\n긴 침묵.\n\n"…좋다."',
+    ch:[{t:'계속하기 ▶', n:'s9c2', fx:{deity:{chilsung:5}}}]
+  },
+
+  's9c2': {
+    sp:'maehyang', illus:'🕯️', bg:'dark',
+    txt:'"어머니가 깨어나는 거요."\n\n어디서 나온 말인지 몰랐다.\n\n칠성신이 처음으로 웃었다.',
+    ch:[{t:'계속하기 ▶', n:'s9c3', fx:{deity:{chilsung:5}, singi:15, flag:{dealMade:true}}}]
+  },
+
+  's9c3': {
+    sp:'chilsung', illus:'⭐', bg:'dark',
+    txt:'"그건 내 영역이 아니다."\n\n"하지만—시간을 줄 수 있다."\n\n"굿을 마칠 때까지."',
+    ch:[{t:'계속하기 ▶', n:'s10', fx:{}}]
+  },
+
+  // 씬 1-3 공통 마무리
+  's10': {
+    sp:'chilsung', illus:'⭐', bg:'dark',
+    txt:'"네 어머니가 부탁했다."\n\n"말해줄 수 없다."\n\n"네가 스스로 알아야 한다. 그게 조건이다."',
+    ch:[{t:'계속하기 ▶', n:'s10_wake', fx:{singi:20}}]
+  },
+
+  's10_wake': {
+    sp:'narrator', illus:'🚇', bg:'subway',
+    txt:'지하철이 움직이고 있었다. 소리가 돌아왔다.\n\n성수역이었다.\n가방 속 핸드폰이 울렸다.\n\n아주머니였다.',
+    ch:[{t:'계속하기 ▶', n:'s11', fx:{}}]
+  },
+
+  // ============================================================
+  // 씬 1-4: 의뢰인
+  // ============================================================
+
+  's11': {
+    sp:'neighbor', illus:'🏠', bg:'dark',
+    txt:'"아가, 매향이 왔어? 우리 딸이 좀 이상해."\n\n"3주째 말을 안 해. 병원은 다 가봤는데."\n\n"혹시…봐줄 수 있어?"',
+    ch:[{t:'계속하기 ▶', n:'s12_choice', fx:{}}]
+  },
+
+  // 씬 1-4 메인 선택지
+  's12_choice': {
+    sp:'maehyang', illus:'🕯️', bg:'dark',
+    txt:'문 앞.\n\n소금이 뿌려져 있었다.\n\n나는 무당이 아니다.\n알고 있었다.\n그런데 발이 안 떨어졌다.',
+    ch:[
+      {t:'"들어가도 될까요."',
+       n:'s13a', fx:{trust:{woman:10}, singi:5, tags:['수용'], deity:{sungju:8}},
+       hint:'+신기 5'},
+      {t:'"어머니한테 연락드릴게요."',
+       n:'s13b', fx:{trust:{woman:-5}, tags:['현실']}},
+      {t:'(눈을 감아본다.)',
+       n:'s13c', locked:10,
+       fx:{trust:{woman:15}, singi:-5, tags:['직관'], deity:{chilsung:5}, item:'eyeclosed'},
+       hint:'🔒 신기 10 소모'},
+    ]
+  },
+
+  // 집 안 루트
+  's13a': {
+    sp:'narrator', illus:'👁️', bg:'dark',
+    txt:'초등학생 여자아이였다.\n이불을 뒤집어쓰고 있었다.\n\n도망가지 않았다.\n그게 이상했다.',
+    ch:[{t:'계속하기 ▶', n:'s13a2', fx:{}}]
+  },
+
+  's13a2': {
+    sp:'child', illus:'👁️', bg:'dark',
+    txt:'"언니도 보여?"\n\n속삭이듯 말했다.\n\n"저기 구석에."',
+    ch:[
+      {t:'"뭐가 보여?"',
+       n:'s13a3', fx:{trust:{child:15}, singi:5, tags:['진실'], mindam:'arang'},
+       hint:'민담 아랑 설화 획득'},
+      {t:'"아무것도 없어."',
+       n:'s13a4', fx:{trust:{child:-5}, tags:['현실']}},
+    ]
+  },
+
+  's13a3': {
+    sp:'child', illus:'👁️', bg:'dark',
+    txt:'"여자요. 머리가 길어요."\n\n"계속 울고 있어요."\n\n매향은 구석을 봤다.\n아무것도 없었다.\n그런데 차가웠다.',
+    ch:[{t:'계속하기 ▶', n:'s14', fx:{deity:{gumiho:5}, trust:{child:5}}}]
+  },
+
+  's13a4': {
+    sp:'narrator', illus:'👁️', bg:'dark',
+    txt:'아이가 다시 이불 속으로 들어갔다.\n\n매향은 방을 나왔다.\n계단에서 잠깐 멈췄다.\n\n추웠다.',
+    ch:[{t:'계속하기 ▶', n:'s14', fx:{}}]
+  },
+
+  // 연락 루트
+  's13b': {
+    sp:'narrator', illus:'📱', bg:'dark',
+    txt:'어머니는 전화를 안 받았다.\n\n당연히.\n\n아주머니에게 죄송하다고 문자를 보냈다.\n답장이 없었다.\n\n그게 더 무거웠다.',
+    ch:[{t:'계속하기 ▶', n:'s14', fx:{trust:{neighbor:-5}}}]
+  },
+
+  // 직관 루트
+  's13c': {
+    sp:'narrator', illus:'👁️', bg:'dark',
+    txt:'눈을 감았다.\n\n뭔가 보일 거라고 생각하지 않았다.\n\n보였다.\n구석에 뭔가—빛 같은 게.\n\n눈을 떴다. 없었다.',
+    ch:[{t:'계속하기 ▶', n:'s13c2', fx:{deity:{chilsung:3}}}]
+  },
+
+  's13c2': {
+    sp:'child', illus:'👁️', bg:'dark',
+    txt:'"언니 보였어?"\n\n아이가 이불 밖으로 고개를 내밀었다.\n\n처음으로 말했다.',
+    ch:[{t:'계속하기 ▶', n:'s14', fx:{trust:{child:20}, singi:10, tags:['직관'], deity:{gumiho:8}}}]
+  },
+
+  // 씬 1-4 마무리 → 씬 1-5
+  's14': {
+    sp:'narrator', illus:'🌙', bg:'dark',
+    txt:'밤 11시.\n\n어머니한테 문자가 왔다.\n"굿을 해야 한다."\n\n두 글자.\n\n매향은 오래 화면을 봤다.',
+    ch:[{t:'계속하기 ▶', n:'s15', fx:{}}]
+  },
+
+  // ============================================================
+  // 씬 1-5: 첫 굿
+  // ============================================================
+
+  's15': {
+    sp:'narrator', illus:'🕯️', bg:'shrine',
+    txt:'신당에 혼자였다.\n\n향도 없었다. 장구도 없었다.\n어머니 무복(巫服) 한 벌.\n신단 위 신물.\n\n그게 전부였다.',
+    ch:[{t:'계속하기 ▶', n:'s15_chil', fx:{}}]
+  },
+
+  // 칠성신 등장 (인연도 따라 다름)
+  's15_chil': {
+    sp:'chilsung', illus:'⭐', bg:'shrine',
+    txt:'"왔군."\n\n어디서 나온 목소리인지 몰랐다.\n\n"오늘이 그날이군."',
+    ch:[{t:'계속하기 ▶', n:'s16_choice', fx:{}}]
+  },
+
+  // 씬 1-5 핵심 선택지
+  's16_choice': {
+    sp:'maehyang', illus:'🪭', bg:'shrine',
+    txt:'무복이 있었다.\n\n들었다가, 내려놨다가, 다시 들었다.\n\n입으면—\n뭔가 달라진다는 걸 알고 있었다.',
+    ch:[
+      {t:'(무복을 입는다.)',
+       n:'s17a', fx:{trust:{mother:10}, singi:5, tags:['수용'], deity:{samshin:10}},
+       hint:'삼신할머니 주목'},
+      {t:'(무복 없이 신단 앞에 선다.)',
+       n:'s17b', fx:{trust:{mother:5}, tags:['저항']}},
+      {t:'칠성신에게 먼저 말을 건다.',
+       n:'s17c', locked:30,
+       fx:{deity:{chilsung:15}, singi:-20, tags:['지혜'], flag:{dealComplete:true}},
+       hint:'🔒 신기 30 소모 · 거래 완성'},
+    ]
+  },
+
+  // 굿 진행 — A/B 공통
+  's17a': {
+    sp:'narrator', illus:'🪭', bg:'shrine',
+    txt:'무거웠다.\n\n예상보다 훨씬.\n\n무게는 없었는데—손이 무거웠다.',
+    ch:[{t:'계속하기 ▶', n:'s17_ritual', fx:{}}]
+  },
+
+  's17b': {
+    sp:'narrator', illus:'🕯️', bg:'shrine',
+    txt:'뭘 해야 하는지 몰랐다.\n\n어머니가 하던 걸 기억해냈다.\n손을 모았다. 눈을 감았다.\n\n5분이 지났다.\n아무 일도 일어나지 않았다.',
+    ch:[{t:'계속하기 ▶', n:'s17_ritual', fx:{}}]
+  },
+
+  's17_ritual': {
+    sp:'narrator', illus:'🕯️', bg:'shrine',
+    txt:'새벽 2시였다.\n\n신단 위 물그릇이 흔들렸다.\n바람이 없는데.\n\n칠성신이 어디선가 말했다.',
+    ch:[{t:'계속하기 ▶', n:'s18_choice', fx:{singi:5}}]
+  },
+
+  // 최종 선택: 계약 여부
+  's18_choice': {
+    sp:'chilsung', illus:'⭐', bg:'shrine',
+    txt:'"충분하다."\n\n"한 가지만 묻겠다."\n\n"이름을 말할 수 있느냐."',
+    ch:[
+      {t:'"이매향.\n오늘부터 신을 모시겠습니다."',
+       n:'end_a', fx:{deity:{chilsung:20}, singi:15, tags:['수용']}},
+      {t:'(아무 말도 하지 않는다.)',
+       n:'end_b', fx:{trust:{mother:15}, tags:['저항']}},
+    ]
+  },
+
+  // 거래 루트 굿
+  's17c': {
+    sp:'chilsung', illus:'⭐', bg:'shrine',
+    txt:'"조건을 말해라."\n\n"어머니가 깨어나는 거예요."\n\n칠성신이 웃지 않았다.\n대신—고개를 끄덕였다.',
+    ch:[{t:'계속하기 ▶', n:'s17c2', fx:{}}]
+  },
+
+  's17c2': {
+    sp:'narrator', illus:'🕯️', bg:'shrine',
+    txt:'굿이 시작됐다.\n\n매향이 시작한 게 아니었다.\n그냥—시작됐다.\n\n새벽 1시였다.',
+    ch:[{t:'계속하기 ▶', n:'end_c', fx:{singi:20, deity:{chilsung:15}}}]
+  },
+
+  // ============================================================
+  // 엔딩
+  // ============================================================
+
+  'end_a': {
+    clr:true, ep:1, next:null,
+    ending:'순응 엔딩',
+    badge:'계약 성립',
+    col:'#c084fc',
+    txt:'칠성신이 말했다.\n\n"들었다."\n\n그게 전부였다.\n그게 전부인데—충분했다.',
+  },
+
+  'end_b': {
+    clr:true, ep:1, next:null,
+    ending:'저항 엔딩',
+    badge:'독자적 루트',
+    col:'#94a3b8',
+    txt:'굿은 끝났다.\n계약은 없었다.\n\n새벽 4시. 어머니한테서 문자가 왔다.\n"일어났다."\n\n매향은 서울행 첫차를 검색했다.',
+  },
+
+  'end_c': {
+    clr:true, ep:1, next:null,
+    ending:'거래 엔딩',
+    badge:'진 루트 씨앗',
+    col:'#fbbf24',
+    txt:'어머니가 깨어났을 때,\n매향은 신당 바닥에 앉아 있었다.\n\n"혼자 했어?"\n\n매향은 대답하지 않았다.\n어머니는 더 묻지 않았다.',
+  },
+};
+
+// --- 전체 씬 맵 ---
+const ALL_SCENES = {
+  maehyang: SCENES_MAEHYANG,
+};
+
+</script>
+<script>
+// =======================================
+// ENGINE — 무당기(巫堂記) 게임 엔진
+// =======================================
+
+let state = {
+  phase: 'title',
+  char: 'maehyang',
+  scenes: null,
+  sceneId: 's0',
+  ep: 1,
+  trust: {},          // 인물별 인연 수치
+  mindam: [],         // 획득한 민담 ID 배열
+  singi: 0,           // 신기 (기존 coin)
+  items: [],          // 획득 아이템 키 배열
+  skills: [],         // 해금된 스킬 ID 배열
+  deityYeonin: {},    // 신위별 인연 (기존 constellationTrust)
+  deitySponsored: {}, // 신위별 신기 수령 총액
+  flags: {},          // 씬 플래그 (dealMade, shinnul 등)
+  sacrificeCount: 0,  // 희생 태그 횟수
+  acceptCount: 0,     // 수용 태그 횟수
+  resistCount: 0,     // 저항 태그 횟수
+  truthCount: 0,      // 진실/직관 태그 횟수
+  dispTxt: '',
+  typing: false,
+  choicesOn: false,
+  lastClear: null,
+  shopHintActive: false,
+};
+let typingTimer = null;
+let constTimer = null;
+let currentTab = 'inventory';
+
+function resetTrust() {
+  const t = {};
+  Object.keys(TRUST_TARGETS).forEach(k => t[k] = 0);
+  return t;
+}
+
+function resetDeityYeonin() {
+  const y = {}, s = {};
+  Object.keys(DEITIES).forEach(k => { y[k] = 0; s[k] = 0; });
+  return {yeonin: y, sponsored: s};
+}
+
+function getDefaultSkills(charId) {
+  return (SKILLS[charId] || []).filter(s => !s.locked).map(s => s.id);
+}
+
+// --- SAVE/LOAD ---
+function getSaveData() {
+  try { return JSON.parse(localStorage.getItem('mudanggi_save') || '{}'); } catch(e) { return {}; }
+}
+function setSaveData(d) {
+  try { localStorage.setItem('mudanggi_save', JSON.stringify(d)); } catch(e) {}
+}
+
+// --- MODAL ---
+function openModal(tab) {
+  currentTab = tab || 'inventory';
+  renderModalTabs();
+  renderModalContent();
+  document.getElementById('modal-overlay').style.display = 'flex';
+}
+function closeModal() {
+  document.getElementById('modal-overlay').style.display = 'none';
+}
+
+// --- INIT ---
+function init() {
+  buildStars();
+  buildCharCards();
+  showScreen('title');
+
+  buildStoryMap();
+  document.getElementById('shop-btn').onclick = openTitleShop;
+  document.getElementById('shop-modal-close').onclick = closeTitleShop;
+  document.getElementById('shop-modal').onclick = (e) => { if (e.target.id === 'shop-modal') closeTitleShop(); };
+  document.getElementById('ending-text-close').onclick = closeEndingTextModal;
+  document.getElementById('ending-text-modal').onclick = (e) => { if (e.target.id === 'ending-text-modal') closeEndingTextModal(); };
+  document.getElementById('start-btn').onclick = startGame;
+  document.getElementById('retry-btn').onclick = () => {
+    showScreen('title');
+    buildCharCards();
+    buildStoryMap();
+  };
+  document.getElementById('next-ep-btn').onclick = continueNextEp;
+  document.getElementById('exit-btn').onclick = () => {
+    if (confirm('정말 나가시겠어요? 진행 상황은 저장되지 않습니다.')) {
+      if (typingTimer) { clearInterval(typingTimer); typingTimer = null; }
+      if (constTimer) { clearTimeout(constTimer); constTimer = null; }
+      showScreen('title');
+      buildCharCards();
+      buildStoryMap();
+    }
+  };
+  document.getElementById('menu-btn').onclick = () => openModal('inventory');
+  document.getElementById('modal-close-btn').onclick = closeModal;
+  document.getElementById('modal-overlay').onclick = (e) => {
+    if (e.target.id === 'modal-overlay') closeModal();
+  };
+}
+
+function buildStars() {
+  const layer = document.getElementById('stars-layer');
+  layer.innerHTML = '';
+  for (let i = 0; i < 28; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 2 + 0.5;
+    s.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*5}s;animation-duration:${2+Math.random()*5}s;opacity:0.12`;
+    layer.appendChild(s);
+  }
+}
+
+function buildCharCards() {
+  const wrap = document.getElementById('char-cards');
+  wrap.innerHTML = '';
+  const save = getSaveData();
+  Object.entries(CHARS).forEach(([id, ch]) => {
+    const card = document.createElement('div');
+    card.className = 'char-card' + (id === state.char ? ' selected' : '');
+    card.dataset.id = id;
+    const completed = save[id] && save[id].completed;
+    card.innerHTML = `
+      <div style="font-size:28px;margin-bottom:8px">${ch.illus}</div>
+      <div class="char-card-name" style="color:${ch.col}">${ch.name}</div>
+      <div class="char-card-desc">${ch.desc}</div>
+      ${completed ? '<div class="char-badge">CLEAR</div>' : ''}
+    `;
+    card.onclick = () => {
+      document.querySelectorAll('.char-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      state.char = id;
+    };
+    wrap.appendChild(card);
+  });
+}
+
+function showScreen(screen) {
+  document.getElementById('title-screen').style.display = screen === 'title' ? 'flex' : 'none';
+  document.getElementById('game-screen').style.display  = screen === 'game'  ? 'flex' : 'none';
+  document.getElementById('clear-screen').style.display = screen === 'clear' ? 'flex' : 'none';
+}
+
+// --- GAME START ---
+function startGame() {
+  state.scenes = ALL_SCENES[state.char];
+  state.sceneId = 's0';
+  state.ep = 1;
+  state.trust = resetTrust();
+  state.mindam = [];
+  state.singi = 0;
+  state.items = [];
+  state.skills = getDefaultSkills(state.char);
+  const dData = resetDeityYeonin();
+  state.deityYeonin = dData.yeonin;
+  state.deitySponsored = dData.sponsored;
+  state.flags = {};
+  state.sacrificeCount = 0;
+  state.acceptCount = 0;
+  state.resistCount = 0;
+  state.truthCount = 0;
+  state.phase = 'game';
+  state.lastClear = null;
+  state.shopHintActive = false;
+  // 상점 구매 효과 적용
+  const save = getSaveData();
+  if (save.bonus_singi) {
+    state.singi += save.bonus_singi;
+    save.bonus_singi = 0;
+    setSaveData(save);
+  }
+  if (save.bonus_chilsung) {
+    state.deityYeonin.chilsung += 10;
+    save.bonus_chilsung = false;
+    setSaveData(save);
+  }
+  showScreen('game');
+  updateEpInfo();
+  loadScene('s0');
+}
+
+function continueNextEp() {
+  if (!state.lastClear || !state.lastClear.next) return;
+  state.ep++;
+  state.phase = 'game';
+  showScreen('game');
+  updateEpInfo();
+  loadScene(state.lastClear.next);
+}
+
+function updateEpInfo() {
+  document.getElementById('ep-info').textContent = '1막 · ' + (state.ep > 1 ? state.ep + '씬' : '귀가');
+}
+
+// --- LOAD SCENE ---
+function loadScene(id) {
+  if (typingTimer) { clearInterval(typingTimer); typingTimer = null; }
+  state.sceneId = id;
+  state.dispTxt = '';
+  state.typing = true;
+  state.choicesOn = false;
+
+  const sc = state.scenes[id];
+  if (!sc) { console.warn('씬 없음:', id); return; }
+
+  // 화자
+  const nameEl = document.getElementById('speaker-name');
+  const spInfo = SPEAKER_MAP[sc.sp] || SPEAKER_MAP.narrator;
+  if (spInfo.name) {
+    nameEl.textContent = sc.sp === 'system' ? `【 ${spInfo.name} 】` : spInfo.name;
+    nameEl.style.display = 'inline-flex';
+    nameEl.style.color = spInfo.col;
+    nameEl.style.borderColor = spInfo.col + '55';
+  } else {
+    nameEl.style.display = 'none';
+  }
+
+  document.getElementById('scene-illus').textContent = sc.illus || '🕯️';
+  document.getElementById('bg-overlay').className = 'bg-overlay bg-' + (sc.bg || 'dark');
+
+  const dtEl = document.getElementById('dialog-text');
+  dtEl.style.fontFamily = "'Noto Serif KR',serif";
+  dtEl.style.color = '#e0dbd2';
+
+  const cw = document.getElementById('choices-wrap');
+  cw.style.display = 'none';
+  cw.innerHTML = '';
+
+  // 타이핑
+  document.getElementById('skip-hint').style.opacity = '1';
+  const full = sc.txt;
+  let i = 0;
+  typingTimer = setInterval(() => {
+    i++;
+    state.dispTxt = full.slice(0, i);
+    renderText();
+    if (i >= full.length) {
+      clearInterval(typingTimer); typingTimer = null;
+      state.typing = false;
+      state.choicesOn = true;
+      document.getElementById('skip-hint').style.opacity = '0';
+      showChoices();
+    }
+  }, 28);
+
+  updateHUD();
+  maybeShowDeity();
+}
+
+function renderText() {
+  const el = document.getElementById('dialog-text');
+  const lines = state.dispTxt.split('\n');
+  let html = lines.map((l, idx) => l + (idx < lines.length - 1 ? '<br>' : '')).join('');
+  if (state.typing) html += '<span id="cursor-blink">|</span>';
+  el.innerHTML = html;
+}
+
+function skipTyping() {
+  if (!state.typing) return;
+  if (typingTimer) { clearInterval(typingTimer); typingTimer = null; }
+  const sc = state.scenes[state.sceneId];
+  state.dispTxt = sc.txt;
+  state.typing = false;
+  state.choicesOn = true;
+  document.getElementById('skip-hint').style.opacity = '0';
+  renderText();
+  showChoices();
+}
+
+// --- CHOICES ---
+function showChoices() {
+  const sc = state.scenes[state.sceneId];
+  if (!sc || !sc.ch || sc.ch.length === 0) return;
+  const cw = document.getElementById('choices-wrap');
+  cw.innerHTML = '';
+
+  sc.ch.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.style.animationDelay = `${i * 0.07}s`;
+
+    const lockedCost = c.locked || 0;
+    const canAfford = lockedCost === 0 || state.singi >= lockedCost;
+
+    let prefix = lockedCost > 0
+      ? `<span class="choice-arrow ${canAfford ? 'locked-afford' : 'locked-broke'}">🔒</span>`
+      : `<span class="choice-arrow">▷</span>`;
+
+    let suffix = '';
+    if (lockedCost > 0) {
+      suffix = `<span class="choice-fx choice-lock-cost ${canAfford ? '' : 'broke'}">신기 ${lockedCost}</span>`;
+    } else if (c.hint) {
+      suffix = `<span class="choice-fx">${c.hint}</span>`;
+    }
+
+    btn.innerHTML = `${prefix}${c.t}${suffix}`;
+
+    if (!canAfford) {
+      btn.disabled = true;
+      btn.classList.add('choice-locked-disabled');
+    } else {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        handleChoice(c);
+      });
+    }
+    cw.appendChild(btn);
+  });
+  cw.style.display = 'flex';
+}
+
+// --- HANDLE CHOICE ---
+function handleChoice(choice) {
+  const f = choice.fx || {};
+
+  // 신기 잠금 소모
+  if (choice.locked && choice.locked > 0) {
+    state.singi = Math.max(0, state.singi - choice.locked);
+  }
+
+  // 인물별 인연 변화
+  if (f.trust && typeof f.trust === 'object') {
+    Object.entries(f.trust).forEach(([key, val]) => {
+      if (state.trust[key] !== undefined) {
+        state.trust[key] = Math.min(100, Math.max(0, state.trust[key] + val));
+      }
+    });
+  }
+  // trust2 (보조 인연 — 일부 씬에서 두 인물 동시 처리용)
+  if (f.trust2 && typeof f.trust2 === 'object') {
+    Object.entries(f.trust2).forEach(([key, val]) => {
+      if (state.trust[key] !== undefined) {
+        state.trust[key] = Math.min(100, Math.max(0, state.trust[key] + val));
+      }
+    });
+  }
+
+  // 신기 변화
+  if (f.singi) {
+    state.singi = Math.max(0, state.singi + f.singi);
+  }
+
+  // 신위 인연 변화
+  if (f.deity && typeof f.deity === 'object') {
+    Object.entries(f.deity).forEach(([key, val]) => {
+      if (state.deityYeonin[key] !== undefined) {
+        state.deityYeonin[key] = Math.min(100, Math.max(0, state.deityYeonin[key] + val));
+      }
+    });
+  }
+
+  // 아이템
+  if (f.item && !state.items.includes(f.item)) {
+    state.items.push(f.item);
+    showItemPopup(f.item);
+  }
+
+  // 민담 즉시 획득
+  if (f.mindam && !state.mindam.includes(f.mindam)) {
+    state.mindam.push(f.mindam);
+    const def = MINDAM_DEFS[f.mindam];
+    if (def) showMindamPopup(def);
+  }
+
+  // 플래그
+  if (f.flag && typeof f.flag === 'object') {
+    Object.assign(state.flags, f.flag);
+  }
+
+  // 태그 기반 카운터
+  const tags = f.tags || [];
+  if (tags.includes('희생') || tags.includes('보호')) state.sacrificeCount++;
+  if (tags.includes('수용')) state.acceptCount++;
+  if (tags.includes('저항')) state.resistCount++;
+  if (tags.includes('진실') || tags.includes('직관')) state.truthCount++;
+
+  // 신위 매칭 신기 후원
+  if (tags.length > 0) processDeityResponse(tags);
+
+  // 민담 조건 자동 체크
+  checkMindamConditions();
+
+  updateHUD();
+
+  const next = state.scenes[choice.n];
+  if (next && next.clr) {
+    goToClear(choice.n, next);
+  } else if (next) {
+    loadScene(choice.n);
+  } else {
+    console.warn('다음 씬 없음:', choice.n);
+  }
+}
+
+// --- DEITY RESPONSE ---
+function processDeityResponse(tags) {
+  let bestKey = null;
+  let bestScore = 0;
+
+  Object.entries(DEITIES).forEach(([key, d]) => {
+    let score = 0;
+    tags.forEach(tag => {
+      if (d.likes && d.likes.includes(tag)) score += 1;
+      if (d.dislikes && d.dislikes.includes(tag)) score -= 1;
+    });
+    if (score > bestScore) { bestScore = score; bestKey = key; }
+  });
+
+  if (!bestKey || bestScore <= 0) return;
+
+  const singiReward = Math.floor(Math.random() * 8 + 3) * bestScore;
+  state.singi += singiReward;
+  state.deityYeonin[bestKey] = Math.min(100, (state.deityYeonin[bestKey] || 0) + 2 * bestScore);
+  state.deitySponsored[bestKey] = (state.deitySponsored[bestKey] || 0) + singiReward;
+
+  const d = DEITIES[bestKey];
+  const yeonin = state.deityYeonin[bestKey];
+
+  // 인연 30+ → 스킬 힌트
+  if (yeonin >= 30 && yeonin < 35) {
+    showDeityPopup(`${d.icon} 【${d.name}】이 인연 30에 도달했습니다.\n숨겨진 선택지가 열릴 수 있습니다.`, singiReward, yeonin);
+    checkDeitySkillUnlock(bestKey);
+  } else if (Math.random() < 0.35) {
+    showDeityPopup(`${d.icon} 【${d.name}】이 주목합니다. +${singiReward} 신기`, singiReward, yeonin);
+  }
+
+  updateHUD();
+}
+
+function checkDeitySkillUnlock(deityKey) {
+  const unlockMap = { chilsung: 'contract', gumiho: 'mindam_eye' };
+  const skillId = unlockMap[deityKey];
+  if (skillId && !state.skills.includes(skillId)) {
+    state.skills.push(skillId);
+  }
+}
+
+// --- MINDAM CHECK ---
+function checkMindamConditions() {
+  const checks = [
+    { id:'bari',      condition: () => state.sacrificeCount >= 2 },
+    { id:'shimchung', condition: () => state.acceptCount >= 3 },
+    { id:'gumiho_s',  condition: () => state.truthCount >= 3 },
+  ];
+  checks.forEach(({ id, condition }) => {
+    if (!state.mindam.includes(id) && condition()) {
+      state.mindam.push(id);
+      const def = MINDAM_DEFS[id];
+      if (def) showMindamPopup(def);
+    }
+  });
+  // mindam_eye 스킬 해금
+  if (state.mindam.length >= 3 && !state.skills.includes('mindam_eye')) {
+    state.skills.push('mindam_eye');
+  }
+}
+
+// --- POPUPS ---
+function showDeityPopup(msg, singi, yeonin) {
+  const popup = document.getElementById('constellation-popup');
+  document.getElementById('const-msg').textContent = msg;
+  document.getElementById('const-coin').textContent = singi > 0 ? `+${singi} 신기` : '';
+  document.getElementById('const-coin').style.display = singi > 0 ? 'block' : 'none';
+  document.getElementById('const-favor').textContent = `인연: ${yeonin}`;
+  popup.classList.remove('hiding');
+  popup.style.display = 'block';
+  if (constTimer) clearTimeout(constTimer);
+  constTimer = setTimeout(() => {
+    popup.classList.add('hiding');
+    setTimeout(() => { popup.style.display = 'none'; popup.classList.remove('hiding'); }, 300);
+  }, 3000);
+}
+
+function showMindamPopup(def) {
+  const popup = document.getElementById('seolhwa-popup');
+  document.getElementById('seolhwa-popup-icon').textContent = def.icon;
+  document.getElementById('seolhwa-popup-name').textContent = def.name;
+  document.getElementById('seolhwa-popup-desc').textContent = def.desc;
+  popup.style.display = 'flex';
+  setTimeout(() => { popup.style.display = 'none'; }, 3500);
+}
+
+function showItemPopup(itemKey) {
+  const item = ITEMS[itemKey];
+  if (!item) return;
+  const popup = document.getElementById('constellation-popup');
+  document.getElementById('const-msg').textContent = `${item.icon} ${item.name} 획득!`;
+  document.getElementById('const-coin').textContent = item.desc;
+  document.getElementById('const-coin').style.display = 'block';
+  document.getElementById('const-favor').textContent = '';
+  popup.classList.remove('hiding');
+  popup.style.display = 'block';
+  if (constTimer) clearTimeout(constTimer);
+  constTimer = setTimeout(() => {
+    popup.classList.add('hiding');
+    setTimeout(() => { popup.style.display = 'none'; popup.classList.remove('hiding'); }, 300);
+  }, 2500);
+}
+
+function maybeShowDeity() {
+  if (Math.random() > 0.15) return;
+  const keys = Object.keys(DEITIES);
+  const key = keys[Math.floor(Math.random() * keys.length)];
+  const d = DEITIES[key];
+  const yeonin = state.deityYeonin[key] || 0;
+  if (yeonin < 2) return; // 인연 없는 신은 반응 안 함
+  const msgs = [
+    `${d.icon} 【${d.name}】이 당신을 지켜보고 있습니다.`,
+    `${d.icon} 【${d.name}】이 고개를 끄덕입니다.`,
+    `신들이 술렁입니다.`,
+  ];
+  showDeityPopup(msgs[Math.floor(Math.random() * msgs.length)], 0, yeonin);
+}
+
+// --- CLEAR / ENDING ---
+function goToClear(id, sc) {
+  if (typingTimer) { clearInterval(typingTimer); typingTimer = null; }
+  if (constTimer) { clearTimeout(constTimer); constTimer = null; }
+
+  state.lastClear = sc;
+
+  // 인연 최고치
+  const maxTrust = Object.values(state.trust).length > 0
+    ? Math.max(...Object.values(state.trust))
+    : 0;
+
+  // EP.1 클리어 저장
+  if (sc.ep === 1) {
+    const save = getSaveData();
+    const endingKey = sc.ending || 'unknown';
+    if (!save[state.char]) save[state.char] = {};
+    save[state.char].lastEnding = endingKey;
+    save[state.char].completed = true;
+    save[state.char].maxTrust = maxTrust;
+    // 엔딩 해금 저장
+    if (!save.maehyang) save.maehyang = {};
+    if (!save.maehyang.endings) save.maehyang.endings = {};
+    if (sc.ending === '순응 엔딩') save.maehyang.endings.a = true;
+    if (sc.ending === '저항 엔딩') save.maehyang.endings.b = true;
+    if (sc.ending === '거래 엔딩') save.maehyang.endings.c = true;
+    // 누적 신기
+    if (!save.totalSingi) save.totalSingi = 0;
+    save.totalSingi += state.singi;
+    setSaveData(save);
+  }
+
+  // 클리어 화면 렌더
+  document.getElementById('final-trust').textContent = maxTrust;
+  document.getElementById('final-seolhwa').textContent = state.mindam.length;
+  document.getElementById('final-coin').textContent = state.singi;
+  document.getElementById('clear-msg').textContent = sc.txt;
+
+  const badge = document.getElementById('ending-badge');
+  badge.textContent = sc.badge || '';
+  badge.style.background = (sc.col || '#c084fc') + '22';
+  badge.style.color = sc.col || '#c084fc';
+  badge.style.border = '1px solid ' + (sc.col || '#c084fc') + '66';
+  document.getElementById('clear-title').textContent = sc.ending || '클리어!';
+  document.getElementById('clear-ep-label').textContent = sc.ep ? `1막 ${sc.ep}씬` : '1막';
+  document.getElementById('clear-star').textContent = sc.badge === '진 루트 씨앗' ? '★' : '◈';
+
+  const nextBtn = document.getElementById('next-ep-btn');
+  nextBtn.style.display = sc.next ? 'inline-block' : 'none';
+  if (sc.next) nextBtn.textContent = '2막으로 ▶';
+
+  showScreen('clear');
+}
+
+// --- HUD ---
+function updateHUD() {
+  const sc = state.scenes ? state.scenes[state.sceneId] : null;
+  const hudTrust = document.getElementById('hud-trust-pills');
+  hudTrust.innerHTML = '';
+
+  const spToTrust = {
+    mother: 'mother', neighbor: 'neighbor', woman: 'woman', child: 'child',
+  };
+  const keys = [];
+  if (sc && spToTrust[sc.sp]) keys.push(spToTrust[sc.sp]);
+  const sorted = Object.entries(state.trust)
+    .filter(([k]) => !keys.includes(k) && state.trust[k] > 0)
+    .sort((a, b) => b[1] - a[1]);
+  sorted.forEach(([k]) => keys.push(k));
+
+  keys.slice(0, 2).forEach(key => {
+    const t = TRUST_TARGETS[key];
+    if (!t) return;
+    const val = state.trust[key] || 0;
+    const pill = document.createElement('div');
+    pill.className = 'stat-pill';
+    pill.innerHTML = `
+      <span style="color:${t.col};font-size:10px">${t.icon}</span>
+      <div class="stat-track"><div class="stat-fill" style="width:${val}%;background:${t.col}"></div></div>
+      <span style="color:${t.col};font-size:10px">${val}</span>
+    `;
+    hudTrust.appendChild(pill);
+  });
+
+  document.getElementById('val-seolhwa').textContent = '📜 ' + state.mindam.length;
+  document.getElementById('val-coin').textContent = '🔮 ' + state.singi;
+}
+
+// --- STORY MAP ---
+const ENDING_MAP = [
+  {key:'a', name:'순응 엔딩', icon:'🕯️', col:'#c084fc', sceneId:'end_a'},
+  {key:'b', name:'저항 엔딩', icon:'🌙', col:'#888780', sceneId:'end_b'},
+  {key:'c', name:'거래 엔딩', icon:'⭐', col:'#fbbf24', sceneId:'end_c'},
+];
+
+function buildStoryMap() {
+  const wrap = document.getElementById('story-map-cards');
+  wrap.innerHTML = '';
+  const save = getSaveData();
+  const endings = (save.maehyang && save.maehyang.endings) || {};
+
+  ENDING_MAP.forEach(e => {
+    const unlocked = endings[e.key] === true;
+    const card = document.createElement('div');
+    card.className = 'story-map-card ' + (unlocked ? 'unlocked' : 'locked');
+    if (unlocked) {
+      card.style.background = e.col + '1a';
+      card.style.borderColor = e.col + '44';
+    }
+    card.innerHTML = `
+      <div class="story-map-card-icon">${unlocked ? e.icon : '🔒'}</div>
+      <div class="story-map-card-name" style="color:${unlocked ? e.col : 'rgba(255,255,255,.3)'}">${unlocked ? e.name : '???'}</div>
+      ${unlocked ? `<div class="story-map-card-badge" style="background:${e.col}22;color:${e.col};border:1px solid ${e.col}66;">CLEAR</div>` : ''}
+    `;
+    wrap.appendChild(card);
+  });
+}
+
+// --- TITLE SHOP ---
+const TITLE_SHOP_ITEMS = [
+  {id:'singi_bonus', name:'신기 여유', desc:'다음 런 시작 신기 +10', cost:30, icon:'✨'},
+  {id:'chilsung_mem', name:'칠성신의 기억', desc:'다음 런 칠성신 인연 +10으로 시작', cost:50, icon:'⭐'},
+  {id:'hint_bari', name:'민담 실마리', desc:'바리공주 민담 조건 공개', cost:20, icon:'📜'},
+  {id:'ending_review', name:'전생의 기록', desc:'해금된 엔딩 결말 텍스트 다시 보기', cost:0, icon:'📖'},
+];
+
+function openTitleShop() {
+  const save = getSaveData();
+  document.getElementById('shop-singi-display').textContent = '보유 신기: ' + (save.totalSingi || 0);
+  renderTitleShopItems();
+  document.getElementById('shop-modal').style.display = 'flex';
+}
+
+function closeTitleShop() {
+  document.getElementById('shop-modal').style.display = 'none';
+}
+
+function renderTitleShopItems() {
+  const save = getSaveData();
+  const total = save.totalSingi || 0;
+  const body = document.getElementById('shop-modal-body');
+  body.innerHTML = TITLE_SHOP_ITEMS.map(item => {
+    const canBuy = item.cost === 0 || total >= item.cost;
+    return `<div class="modal-card">
+      <div class="modal-card-icon">${item.icon}</div>
+      <div class="modal-card-info">
+        <div class="modal-card-name">${item.name}</div>
+        <div class="modal-card-desc">${item.desc}</div>
+      </div>
+      <button class="modal-card-btn ${canBuy ? '' : 'disabled'}"
+        onclick="buyTitleShopItem('${item.id}',${item.cost})"
+        ${canBuy ? '' : 'disabled'}>${item.cost > 0 ? '🔮' + item.cost : '무료'}</button>
+    </div>`;
+  }).join('');
+}
+
+function buyTitleShopItem(itemId, cost) {
+  const save = getSaveData();
+  const total = save.totalSingi || 0;
+  if (cost > 0 && total < cost) return;
+
+  switch (itemId) {
+    case 'singi_bonus':
+      save.bonus_singi = (save.bonus_singi || 0) + 10;
+      save.totalSingi = total - cost;
+      setSaveData(save);
+      break;
+    case 'chilsung_mem':
+      save.bonus_chilsung = true;
+      save.totalSingi = total - cost;
+      setSaveData(save);
+      break;
+    case 'hint_bari':
+      save.hint_bari = true;
+      save.totalSingi = total - cost;
+      setSaveData(save);
+      alert('바리공주 민담 조건:\n' + MINDAM_DEFS.bari.condition);
+      break;
+    case 'ending_review':
+      showEndingReview();
+      return;
+  }
+  document.getElementById('shop-singi-display').textContent = '보유 신기: ' + (save.totalSingi || 0);
+  renderTitleShopItems();
+}
+
+function showEndingReview() {
+  const save = getSaveData();
+  const endings = (save.maehyang && save.maehyang.endings) || {};
+  const unlocked = ENDING_MAP.filter(e => endings[e.key] === true);
+  if (unlocked.length === 0) {
+    alert('아직 해금된 엔딩이 없습니다.');
+    return;
+  }
+  // 첫 번째 해금 엔딩 표시 (여러 개면 순서대로)
+  let html = '';
+  unlocked.forEach(e => {
+    const sc = SCENES_MAEHYANG[e.sceneId];
+    if (sc) {
+      html += `<div style="margin-bottom:20px;">
+        <div style="font-size:14px;font-weight:700;color:${e.col};margin-bottom:8px;">${e.icon} ${e.name}</div>
+        <div style="font-size:13px;line-height:2;color:var(--purple);white-space:pre-wrap;font-style:italic;">${sc.txt}</div>
+      </div>`;
+    }
+  });
+  document.getElementById('ending-text-title').textContent = '전생의 기록';
+  document.getElementById('ending-text-body').innerHTML = html;
+  document.getElementById('ending-text-modal').style.display = 'flex';
+}
+
+function closeEndingTextModal() {
+  document.getElementById('ending-text-modal').style.display = 'none';
+}
+
+window.skipTyping = skipTyping;
+window.buyTitleShopItem = buyTitleShopItem;
+init();
+
+</script>
+<script>
+// =======================================
+// UI — 무당기(巫堂記) 모달 창
+// =======================================
+
+function renderModalTabs() {
+  const tabs = [
+    {id:'inventory', label:'🎒 아이템'},
+    {id:'skills',    label:'⚡ 능력'},
+    {id:'mindam',    label:'📜 민담'},
+    {id:'deity',     label:'⭐ 신위'},
+    {id:'shop',      label:'🔮 신기'},
+  ];
+  const wrap = document.getElementById('modal-tabs');
+  wrap.innerHTML = '';
+  tabs.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'modal-tab' + (t.id === currentTab ? ' active' : '');
+    btn.textContent = t.label;
+    btn.onclick = () => { currentTab = t.id; renderModalTabs(); renderModalContent(); };
+    wrap.appendChild(btn);
+  });
+}
+
+function renderModalContent() {
+  const body = document.getElementById('modal-body');
+  switch (currentTab) {
+    case 'inventory': body.innerHTML = renderInventory(); break;
+    case 'skills':    body.innerHTML = renderSkills();    break;
+    case 'mindam':    body.innerHTML = renderMindam();    break;
+    case 'deity':     body.innerHTML = renderDeity();     break;
+    case 'shop':      body.innerHTML = renderShop();      break;
+  }
+}
+
+// --- INVENTORY ---
+function renderInventory() {
+  if (state.items.length === 0) {
+    return '<div class="modal-empty">아직 획득한 아이템이 없습니다.</div>';
+  }
+  return state.items.map(key => {
+    const item = ITEMS[key];
+    if (!item) return '';
+    return `<div class="modal-card">
+      <div class="modal-card-icon">${item.icon}</div>
+      <div class="modal-card-info">
+        <div class="modal-card-name">${item.name}</div>
+        <div class="modal-card-desc">${item.desc}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// --- SKILLS ---
+function renderSkills() {
+  const charSkills = SKILLS[state.char] || [];
+  if (charSkills.length === 0) return '<div class="modal-empty">능력 데이터 없음</div>';
+  return charSkills.map(sk => {
+    const unlocked = state.skills.includes(sk.id);
+    return `<div class="modal-card ${unlocked ? '' : 'locked'}">
+      <div class="modal-card-icon">${unlocked ? '⚡' : '🔒'}</div>
+      <div class="modal-card-info">
+        <div class="modal-card-name">${unlocked ? sk.name : '???'}</div>
+        <div class="modal-card-desc">${unlocked ? sk.desc : (sk.condition || '잠금됨')}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// --- MINDAM (설화 대체) ---
+function renderMindam() {
+  const entries = Object.entries(MINDAM_DEFS);
+  return entries.map(([id, def]) => {
+    const owned = state.mindam.includes(id);
+    return `<div class="modal-card ${owned ? 'seolhwa-owned' : 'locked'}">
+      <div class="modal-card-icon">${owned ? def.icon : '❓'}</div>
+      <div class="modal-card-info">
+        <div class="modal-card-name">${owned ? def.name : '???'}</div>
+        <div class="modal-card-desc">${owned ? def.desc : '미발견'}</div>
+        ${owned ? '' : `<div class="modal-card-desc" style="margin-top:4px;color:rgba(255,255,255,.25)">조건: ${def.condition}</div>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// --- DEITY (성좌 대체) ---
+function renderDeity() {
+  return Object.entries(DEITIES).map(([key, d]) => {
+    const yeonin = state.deityYeonin[key] || 0;
+    const sponsored = state.deitySponsored[key] || 0;
+    const active = yeonin > 0;
+    return `<div class="modal-card">
+      <div class="modal-card-icon">${yeonin >= 30 ? '🌟' : yeonin >= 15 ? '✨' : d.icon}</div>
+      <div class="modal-card-info">
+        <div class="modal-card-name" style="color:${yeonin >= 15 ? '#fbbf24' : 'rgba(255,255,255,0.6)'}">${active ? d.name : '???'}</div>
+        <div class="const-bar-wrap">
+          <div class="const-bar" style="width:${yeonin}%;background:${yeonin >= 30 ? '#fbbf24' : yeonin >= 15 ? '#f59e0b' : '#c084fc'}"></div>
+        </div>
+        <div class="modal-card-desc">${active ? `인연 ${yeonin} · 신기 후원 ${sponsored}` : '아직 접촉 없음'}</div>
+        ${yeonin >= 30 ? '<div class="modal-card-desc" style="color:#fbbf24;margin-top:4px">인연 30+ · 숨겨진 선택지 해금 가능</div>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// --- SHOP (신기 소비) ---
+function renderShop() {
+  return `<div class="modal-card" style="margin-bottom:8px;background:rgba(192,132,252,.05);border-color:rgba(192,132,252,.2)">
+    <div class="modal-card-icon">🔮</div>
+    <div class="modal-card-info">
+      <div class="modal-card-name">현재 신기</div>
+      <div class="modal-card-desc" style="font-size:20px;font-weight:700;color:#c084fc">${state.singi}</div>
+    </div>
+  </div>` +
+  SHOP_ITEMS.map(item => {
+    if (item.special === 'recharge') {
+      return `<div class="modal-card">
+        <div class="modal-card-icon">${item.icon}</div>
+        <div class="modal-card-info">
+          <div class="modal-card-name">${item.name}</div>
+          <div class="modal-card-desc">${item.desc}</div>
+        </div>
+        <button class="modal-card-btn" onclick="useRecharge()">무료</button>
+      </div>`;
+    }
+    const canBuy = state.singi >= item.cost;
+    return `<div class="modal-card">
+      <div class="modal-card-icon">${item.icon}</div>
+      <div class="modal-card-info">
+        <div class="modal-card-name">${item.name}</div>
+        <div class="modal-card-desc">${item.desc}</div>
+      </div>
+      <button class="modal-card-btn ${canBuy ? '' : 'disabled'}"
+        onclick="buyShopItem('${item.id}',${item.cost})"
+        ${canBuy ? '' : 'disabled'}>🔮${item.cost}</button>
+    </div>`;
+  }).join('');
+}
+
+function buyShopItem(itemId, cost) {
+  if (state.singi < cost) return;
+  state.singi -= cost;
+  switch (itemId) {
+    case 'hint':
+      state.shopHintActive = true;
+      closeModal();
+      showChoices();
+      break;
+    case 'mindam_h':
+      showMindamHint();
+      break;
+  }
+  updateHUD();
+  renderModalContent();
+}
+
+function useRecharge() {
+  state.singi += 10;
+  updateHUD();
+  renderModalContent();
+}
+
+function showMindamHint() {
+  const unowned = Object.entries(MINDAM_DEFS).filter(([id]) => !state.mindam.includes(id));
+  if (unowned.length === 0) {
+    alert('모든 민담을 이미 수집했습니다!');
+    return;
+  }
+  const [id, def] = unowned[Math.floor(Math.random() * unowned.length)];
+  alert(`민담 실마리: ${def.name}\n\n조건: ${def.condition}`);
+}
+
+window.buyShopItem = buyShopItem;
+window.useRecharge = useRecharge;
+
+</script>
+</body>
+</html>
